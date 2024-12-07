@@ -3,9 +3,12 @@ package com.peronal.project.ecomApp.ecomPrj.services;
 import com.peronal.project.ecomApp.ecomPrj.dto.FakeStoreProductDto;
 import com.peronal.project.ecomApp.ecomPrj.models.Category;
 import com.peronal.project.ecomApp.ecomPrj.models.Product;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,22 +27,44 @@ public class FakeProductService implements ProductService {
 
     @Override
     public List<Product> getAllProducts() {
-        return null;
+
+        List<FakeStoreProductDto> fakeStoreProductDtolist = restTemplate.exchange("https://fakestoreapi.com/products"
+                ,HttpMethod.GET
+                ,null
+                ,new ParameterizedTypeReference<List<FakeStoreProductDto>>() {}
+        ).getBody();
+
+        List<Product> productsList = new ArrayList<>();
+        for( FakeStoreProductDto fakeStoreProductDto : fakeStoreProductDtolist){
+            Product product = convertToProduct(fakeStoreProductDto);
+            productsList.add(product);
+        }
+        return productsList;
     }
 
     @Override
-    public Product createProduct(Long id) {
-        return null;
+    public Product createProduct(Product product) {
+        FakeStoreProductDto fakeStoreProductDto = convertToDto(product);
+        fakeStoreProductDto = restTemplate.postForObject("https://fakestoreapi.com/products/", fakeStoreProductDto, FakeStoreProductDto.class);
+        return convertToProduct(fakeStoreProductDto);
     }
 
     @Override
-    public Product udpateProduct(Long id) {
-        return null;
+    public Product udpateProduct(Product product) {
+        FakeStoreProductDto fakeStoreProductDto = convertToDto(product);
+        fakeStoreProductDto = restTemplate.patchForObject("https://fakestoreapi.com/products/" + product.getId()
+                                                            ,fakeStoreProductDto
+                                                            , FakeStoreProductDto.class);
+        return convertToProduct(fakeStoreProductDto);
     }
 
     @Override
     public Product delProduct(Long id) {
-        return null;
+        FakeStoreProductDto fakeStoreProductDto = restTemplate.exchange("https://fakestoreapi.com/products/" + id
+                                                                            ,HttpMethod.DELETE
+                                                                            ,null
+                                                                            ,FakeStoreProductDto.class).getBody();
+        return convertToProduct(fakeStoreProductDto);
     }
 
     private Product convertToProduct(FakeStoreProductDto dto) {
@@ -60,5 +85,24 @@ public class FakeProductService implements ProductService {
         product.setCategory(category);
 
         return product;
+    }
+
+    public static FakeStoreProductDto convertToDto(Product product) {
+        if (product == null) {
+            return null;
+        }
+
+        FakeStoreProductDto dto = new FakeStoreProductDto();
+        dto.setId(product.getId());
+        dto.setTitle(product.getTitle());
+        dto.setPrice(product.getPrice());
+        dto.setDescription(product.getDescription());
+
+        // Convert the Category object to a category string
+        if (product.getCategory() != null) {
+            dto.setCategory(product.getCategory().getTitle());
+        }
+
+        return dto;
     }
 }
