@@ -28,16 +28,19 @@ public class FakeProductService implements ProductService {
     @Override
     public List<Product> getAllProducts() {
 
-        List<FakeStoreProductDto> fakeStoreProductDtolist = restTemplate.exchange("https://fakestoreapi.com/products"
+        /*
+        List<FakeStoreProductDto> fakeStoreProductDtoList = restTemplate.exchange("https://fakestoreapi.com/products"
                 ,HttpMethod.GET
                 ,null
                 ,new ParameterizedTypeReference<List<FakeStoreProductDto>>() {}
         ).getBody();
+        */
+
+        FakeStoreProductDto[] fakeStoreProductDtoList = restTemplate.getForObject("https://fakestoreapi.com/products",FakeStoreProductDto[].class);
 
         List<Product> productsList = new ArrayList<>();
-        for( FakeStoreProductDto fakeStoreProductDto : fakeStoreProductDtolist){
-            Product product = convertToProduct(fakeStoreProductDto);
-            productsList.add(product);
+        for( FakeStoreProductDto fakeStoreProductDto : fakeStoreProductDtoList){
+            productsList.add(convertToProduct(fakeStoreProductDto));
         }
         return productsList;
     }
@@ -50,14 +53,22 @@ public class FakeProductService implements ProductService {
     }
 
     @Override
-    public Product udpateProduct(Product product) {
+    public Product updateProduct(Long id, Product product) {
         FakeStoreProductDto fakeStoreProductDto = convertToDto(product);
-        fakeStoreProductDto = restTemplate.patchForObject("https://fakestoreapi.com/products/" + product.getId()
+        fakeStoreProductDto = restTemplate.patchForObject("https://fakestoreapi.com/products/" + id
                                                             ,fakeStoreProductDto
                                                             , FakeStoreProductDto.class);
         return convertToProduct(fakeStoreProductDto);
     }
 
+    @Override
+    public Product replaceProduct(Long id, Product product){
+        FakeStoreProductDto fakeStoreProductDto = convertToDto(product);
+        fakeStoreProductDto = restTemplate.patchForObject("https://fakestoreapi.com/products/" + id
+                ,fakeStoreProductDto
+                , FakeStoreProductDto.class);
+        return convertToProduct(fakeStoreProductDto);
+    }
     @Override
     public Product delProduct(Long id) {
         FakeStoreProductDto fakeStoreProductDto = restTemplate.exchange("https://fakestoreapi.com/products/" + id
