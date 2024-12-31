@@ -11,7 +11,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Service("FakeProductService")
 public class FakeProductService implements ProductService {
 
     private final RestTemplate restTemplate;

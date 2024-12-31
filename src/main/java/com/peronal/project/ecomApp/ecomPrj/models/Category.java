@@ -1,17 +1,16 @@
 package com.peronal.project.ecomApp.ecomPrj.models;
 
-public class Category {
+import java.util.List;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 
-    private long id;
+@Entity
+public class Category extends BaseModel{
+
     private String title;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
+    @OneToMany
+    private List<Product> productList;
 
     public String getTitle() {
         return title;

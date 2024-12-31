@@ -1,20 +1,19 @@
 package com.peronal.project.ecomApp.ecomPrj.models;
 
-public class Product {
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
-    private Long id;
+@Entity
+public class Product extends BaseModel{
+
     private String title;
     private double price;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "category_id")
     private Category category;
     private String description;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getTitle() {
         return title;

@@ -3,6 +3,7 @@ package com.peronal.project.ecomApp.ecomPrj.controllers;
 import com.peronal.project.ecomApp.ecomPrj.models.Product;
 import com.peronal.project.ecomApp.ecomPrj.services.ProductService;
 import org.apache.catalina.connector.Response;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class ProductController {
 
     private final ProductService productService;
 
-    ProductController(ProductService productService){
+    ProductController(@Qualifier("SelfProductService") ProductService productService){
         this.productService = productService;
     }
 
@@ -56,6 +57,9 @@ public class ProductController {
         return new ResponseEntity<>("Something ent Wrong", HttpStatus.NOT_FOUND);
     }
 
+    //Note: We can definetly write exceptions here
+    //      but this way, we make the controller handle the exceptions
+    //      So instead it is better to write global exception controller adivce using @ControllerAdvice
     @ExceptionHandler(IndexOutOfBoundsException.class)
     public ResponseEntity<String> handleIndexOutOfBoundException(){
         //Debug this to log but just give "Something went wrong" to user
